@@ -9,6 +9,10 @@ const eventSchema = mongoose.Schema({
 	endsAt: String,
 	place: String,
 	capacity: Number,
+	likes: {
+		type: [String],
+		default: [],
+	},
 	subscribers: {
 		type: [String],
 		default: [],
