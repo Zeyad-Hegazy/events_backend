@@ -73,7 +73,7 @@ export const signUp = async (req, res, next) => {
 
 export const createEvent = async (req, res, next) => {
 	const userId = req.userId;
-	const { title, imageUrl, summary, startsAt, endsAt, place, capacity } =
+	const { title, imageUrl, summary, startsAt, endsAt, place, price, capacity } =
 		req.body;
 
 	try {
@@ -91,6 +91,7 @@ export const createEvent = async (req, res, next) => {
 			startsAt,
 			endsAt,
 			place,
+			price,
 			capacity,
 			creator: userId,
 		});
@@ -141,13 +142,43 @@ export const getAllEvents = async (req, res, next) => {
 		const organizer = await Organizer.findById({
 			_id: new mongoose.Types.ObjectId(userId),
 		});
-		const allEvents = organizer.events;
+		const allEventsIds = organizer.events;
 
-		const allEventObjs = await Event.find({ _id: { $in: allEvents } });
+		const allEventObjs = await Event.find({ _id: { $in: allEventsIds } });
 
 		return res
 			.status(200)
 			.json({ message: "Here all events", result: allEventObjs });
+	} catch (error) {
+		res.status(500).json({ message: "somthing went wrong !!", error });
+	}
+};
+
+export const getAllEventSubs = async (req, res, next) => {
+	const userId = req.userId;
+	const eventId = req.params.eventId;
+
+	try {
+		if (!userId)
+			return res.status(401).json({ message: "You not allowed to do that" });
+
+		const organizer = await Organizer.findById({
+			_id: new mongoose.Types.ObjectId(userId),
+		});
+
+		const event = organizer.events.find((event) => event === eventId);
+
+		const eventObj = await Event.findById({
+			_id: new mongoose.Types.ObjectId(event),
+		});
+
+		const allSubsIds = eventObj.subscribers;
+
+		const allSubsObjs = await Users.find({ _id: { $in: allSubsIds } });
+
+		res
+			.status(200)
+			.json({ message: "here all subscibers objects", result: allSubsObjs });
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
