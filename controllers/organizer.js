@@ -1,5 +1,6 @@
 import Organizer from "../models/Organizers.js";
 import Event from "../models/Events.js";
+import Users from "../models/Users.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -31,9 +32,7 @@ export const signIn = async (req, res, next) => {
 
 		res.status(200).json({ result: existingOrganizer, token });
 	} catch (error) {
-		if (error.message) {
-			res.status(500).json({ message: "somthing went wrong !!", error: error });
-		}
+		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
 };
 
@@ -68,8 +67,7 @@ export const signUp = async (req, res, next) => {
 
 		res.status(200).json({ result: result, token: token });
 	} catch (error) {
-		if (error)
-			res.status(500).json({ message: "somthing went wrong !!", error: error });
+		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
 };
 
@@ -79,11 +77,8 @@ export const createEvent = async (req, res, next) => {
 		req.body;
 
 	try {
-		if (!userId) {
-			return res
-				.status(401)
-				.json({ message: "You not allowed to create an event" });
-		}
+		if (!userId)
+			return res.status(401).json({ message: "You not allowed to do that" });
 
 		const organizer = await Organizer.findById({
 			_id: new mongoose.Types.ObjectId(userId),
@@ -107,8 +102,53 @@ export const createEvent = async (req, res, next) => {
 			.status(201)
 			.json({ message: "Event Created successfully", event: createdEvent });
 	} catch (error) {
-		if (error) {
-			res.status(500).json({ message: "somthing went wrong !!", error: error });
-		}
+		res.status(500).json({ message: "somthing went wrong !!", error });
+	}
+};
+
+export const deleteEvent = async (req, res, next) => {
+	const eventId = req.params.eventId;
+	const userId = req.userId;
+
+	try {
+		if (!userId)
+			return res.status(401).json({ message: "You not allowed to do that" });
+
+		await Event.findByIdAndRemove({
+			_id: new mongoose.Types.ObjectId(eventId),
+		});
+
+		const organizer = await Organizer.findById({
+			_id: new mongoose.Types.ObjectId(userId),
+		});
+
+		await organizer.events.pull(eventId);
+		await organizer.save();
+
+		res.status(200).json({ message: "Event deleted successfully" });
+	} catch (error) {
+		res.status(500).json({ message: "somthing went wrong !!", error });
+	}
+};
+
+export const getAllEvents = async (req, res, next) => {
+	const userId = req.userId;
+
+	try {
+		if (!userId)
+			return res.status(401).json({ message: "You not allowed to do that" });
+
+		const organizer = await Organizer.findById({
+			_id: new mongoose.Types.ObjectId(userId),
+		});
+		const allEvents = organizer.events;
+
+		const allEventObjs = await Event.find({ _id: { $in: allEvents } });
+
+		return res
+			.status(200)
+			.json({ message: "Here all events", result: allEventObjs });
+	} catch (error) {
+		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
 };

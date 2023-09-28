@@ -20,6 +20,11 @@ app.use("/organize", orgaizerRoutes);
 app.use("/user", userRoutes);
 app.use("/event", eventRoutes);
 
+// app.use((error, req, res, next) => {
+// 	return res
+// 		.status(error.status)
+// 		.json({ message: "somthing went wrong !!", error: error.message });
+// });
 mongoose
 	.connect(connection_url)
 	.then(() => {
