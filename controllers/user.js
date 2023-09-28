@@ -17,7 +17,7 @@ export const signIn = async (req, res) => {
 		);
 
 		if (!isPasswordCorrect)
-			return res.status(400).josn({ message: "Invalid Password" });
+			return res.status(400).json({ message: "Invalid Password" });
 
 		const token = jwt.sign(
 			{
@@ -29,7 +29,7 @@ export const signIn = async (req, res) => {
 
 		return res.status(200).json({ result: existingUser, token });
 	} catch (error) {
-		if (error) {
+		if (error.message) {
 			res.status(500).json({ message: "somthing went wrong !!", error: error });
 		}
 	}
@@ -76,10 +76,9 @@ export const signUp = async (req, res) => {
 			"SECRET_TEXT"
 		);
 
-		return res.status(200).josn({ result, token });
-	
+		return res.status(200).json({ result, token });
 	} catch (error) {
-		if (error) {
+		if (error.message) {
 			res.status(500).json({ message: "somthing went wrong !!", error: error });
 		}
 	}

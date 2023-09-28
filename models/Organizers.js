@@ -11,6 +11,4 @@ const organizersSchema = mongoose.Schema({
 	},
 });
 
-const Organizer = mongoose.model("Organizer", organizersSchema);
-
-export default Organizer;
+export default mongoose.model("Organizer", organizersSchema);

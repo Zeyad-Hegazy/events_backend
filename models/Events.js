@@ -4,7 +4,7 @@ const eventSchema = mongoose.Schema({
 	title: String,
 	imageUrl: String,
 	summary: String,
-	organizer: String,
+	creator: String,
 	startsAt: String,
 	endsAt: String,
 	place: String,
@@ -19,6 +19,4 @@ const eventSchema = mongoose.Schema({
 	},
 });
 
-const Event = mongoose.model("Event", eventSchema);
-
-export default Event;
+export default mongoose.model("Event", eventSchema);
