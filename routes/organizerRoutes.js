@@ -8,6 +8,7 @@ import {
 	signIn,
 	signUp,
 	createEvent,
+	editEvent,
 	deleteEvent,
 	getAllEvents,
 	getAllEventSubs,
@@ -18,6 +19,8 @@ router.post("/signin", signIn);
 router.post("/signup", signUp);
 
 router.post("/create", auth, createEvent);
+
+router.post("/edit/:eventId", auth, editEvent);
 
 router.delete("/delete/:eventId", auth, deleteEvent);
 

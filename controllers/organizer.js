@@ -78,11 +78,11 @@ export const createEvent = async (req, res, next) => {
 
 	try {
 		if (!userId)
-			return res.status(401).json({ message: "You not allowed to do that" });
+			return res
+				.status(401)
+				.json({ message: "You are not allowed to do that" });
 
-		const organizer = await Organizer.findById({
-			_id: new mongoose.Types.ObjectId(userId),
-		});
+		const organizer = await Organizer.findById(userId);
 
 		const createdEvent = await Event.create({
 			title,
@@ -113,15 +113,13 @@ export const deleteEvent = async (req, res, next) => {
 
 	try {
 		if (!userId)
-			return res.status(401).json({ message: "You not allowed to do that" });
+			return res
+				.status(401)
+				.json({ message: "You are not allowed to do that" });
 
-		await Event.findByIdAndRemove({
-			_id: new mongoose.Types.ObjectId(eventId),
-		});
+		await Event.findByIdAndRemove(eventId);
 
-		const organizer = await Organizer.findById({
-			_id: new mongoose.Types.ObjectId(userId),
-		});
+		const organizer = await Organizer.findById(userId);
 
 		await organizer.events.pull(eventId);
 		await organizer.save();
@@ -137,11 +135,12 @@ export const getAllEvents = async (req, res, next) => {
 
 	try {
 		if (!userId)
-			return res.status(401).json({ message: "You not allowed to do that" });
+			return res
+				.status(401)
+				.json({ message: "You are not allowed to do that" });
 
-		const organizer = await Organizer.findById({
-			_id: new mongoose.Types.ObjectId(userId),
-		});
+		const organizer = await Organizer.findById(userId);
+
 		const allEventsIds = organizer.events;
 
 		const allEventObjs = await Event.find({ _id: { $in: allEventsIds } });
@@ -160,17 +159,15 @@ export const getAllEventSubs = async (req, res, next) => {
 
 	try {
 		if (!userId)
-			return res.status(401).json({ message: "You not allowed to do that" });
+			return res
+				.status(401)
+				.json({ message: "You are not allowed to do that" });
 
-		const organizer = await Organizer.findById({
-			_id: new mongoose.Types.ObjectId(userId),
-		});
+		const organizer = await Organizer.findById(userId);
 
 		const event = organizer.events.find((event) => event === eventId);
 
-		const eventObj = await Event.findById({
-			_id: new mongoose.Types.ObjectId(event),
-		});
+		const eventObj = await Event.findById(event);
 
 		const allSubsIds = eventObj.subscribers;
 
@@ -179,6 +176,42 @@ export const getAllEventSubs = async (req, res, next) => {
 		res
 			.status(200)
 			.json({ message: "here all subscibers objects", result: allSubsObjs });
+	} catch (error) {
+		res.status(500).json({ message: "somthing went wrong !!", error });
+	}
+};
+
+export const editEvent = async (req, res, next) => {
+	const userId = req.userId;
+	const eventId = req.params.eventId;
+
+	const { title, imageUrl, summary, endsAt, price } = req.body;
+
+	try {
+		if (!userId)
+			return res
+				.status(401)
+				.json({ message: "You are not allowed to do that" });
+
+		const organizer = await Organizer.findById(userId);
+
+		const event = organizer.events.find((event) => event === eventId);
+
+		const updatedEvent = await Event.findByIdAndUpdate(
+			event,
+			{
+				title,
+				imageUrl,
+				summary,
+				endsAt,
+				price,
+			},
+			{ new: true }
+		);
+
+		res
+			.status(200)
+			.json({ message: "Event updated successfully", result: updatedEvent });
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
