@@ -1,7 +1,6 @@
 import Organizer from "../models/Organizers.js";
 import Event from "../models/Events.js";
 import Users from "../models/Users.js";
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -212,6 +211,32 @@ export const editEvent = async (req, res, next) => {
 		res
 			.status(200)
 			.json({ message: "Event updated successfully", result: updatedEvent });
+	} catch (error) {
+		res.status(500).json({ message: "somthing went wrong !!", error });
+	}
+};
+
+export const getAllEventLikes = async (req, res, next) => {
+	const userId = req.userId;
+	const eventId = req.params.eventId;
+
+	try {
+		if (!userId)
+			return res
+				.status(401)
+				.json({ message: "You are not allowed to do that" });
+
+		const organizer = await Organizer.findById(userId);
+
+		const event = organizer.events.find((event) => event === eventId);
+
+		const eventObj = await Event.findById(event);
+
+		const allLikesIds = eventObj.likes;
+
+		const allLikesObjs = await Users.find({ _id: { $in: allLikesIds } });
+
+		res.status(200).json({ message: "Here all likes", result: allLikesObjs });
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}

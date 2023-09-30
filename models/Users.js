@@ -9,6 +9,10 @@ const userSchema = mongoose.Schema({
 	email: String,
 	password: String,
 	phoneNumber: String,
+	subscripeAt: {
+		type: [String],
+		default: [],
+	},
 });
 
 export default mongoose.model("User", userSchema);

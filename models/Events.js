@@ -4,7 +4,7 @@ const eventSchema = mongoose.Schema({
 	title: String,
 	imageUrl: String,
 	summary: String,
-	creator: String,
+	creator:  String,
 	startsAt: String,
 	endsAt: String,
 	place: String,
