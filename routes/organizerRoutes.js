@@ -18,7 +18,7 @@ import {
 router.post("/signin", signIn);
 router.post("/signup", signUp);
 router.post("/create", auth, createEvent);
-router.post("/edit/:eventId", auth, editEvent);
+router.patch("/edit/:eventId", auth, editEvent);
 router.delete("/delete/:eventId", auth, deleteEvent);
 router.get("/getallevents", auth, getAllEvents);
 router.get("/getalleventsubs/:eventId", auth, getAllEventSubs);

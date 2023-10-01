@@ -170,7 +170,12 @@ export const getAllEventSubs = async (req, res, next) => {
 
 		const allSubsIds = eventObj.subscribers;
 
-		const allSubsObjs = await Users.find({ _id: { $in: allSubsIds } });
+		const allSubsObjs = await Users.find({ _id: { $in: allSubsIds } }).select([
+			"-_id",
+			"-password",
+			"-subscripeAt",
+			"-__v",
+		]);
 
 		res
 			.status(200)
@@ -234,7 +239,9 @@ export const getAllEventLikes = async (req, res, next) => {
 
 		const allLikesIds = eventObj.likes;
 
-		const allLikesObjs = await Users.find({ _id: { $in: allLikesIds } });
+		const allLikesObjs = await Users.find({ _id: { $in: allLikesIds } }).select(
+			["-_id", "-password", "-subscripeAt", "-__v"]
+		);
 
 		res.status(200).json({ message: "Here all likes", result: allLikesObjs });
 	} catch (error) {
