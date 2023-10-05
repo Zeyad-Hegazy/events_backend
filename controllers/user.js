@@ -99,7 +99,7 @@ export const findOrganizer = async (req, res, next) => {
 
 		const eventsrow = await Event.find({
 			_id: { $in: organizer.events },
-		}).select(["-_id", "-likes", "-subscribers", "-__v", "-creator"]);
+		}).select(["-likes", "-subscribers", "-__v", "-creator"]);
 
 		const resultOrganizer = {
 			name: organizer.name,
@@ -170,7 +170,7 @@ export const getSubscribedEvents = async (req, res, next) => {
 		const user = await User.findById(userId);
 		const allSubscribedEvents = await Event.find({
 			_id: { $in: user.subscripeAt },
-		}).select(["-_id", "-creator", "-likes", "-subscribers", "-__v"]);
+		}).select(["-likes", "-subscribers", "-__v"]);
 
 		res.status(200).json({
 			message: "here all subscribed events",
