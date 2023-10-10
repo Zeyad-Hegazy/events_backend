@@ -29,7 +29,9 @@ export const signIn = async (req, res, next) => {
 			"SECRET_TEXT"
 		);
 
-		res.status(200).json({ result: existingOrganizer, token });
+		res
+			.status(200)
+			.json({ result: existingOrganizer, type: "organizer", token });
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
