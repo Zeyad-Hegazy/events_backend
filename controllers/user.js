@@ -125,10 +125,22 @@ export const likeEvent = async (req, res, next) => {
 			return res
 				.status(400)
 				.json({ message: "You are not allowed to do that" });
+
 		const event = await Event.findById(eventId);
-		event.likes.push(userId);
+
+		const index = event.likes.findIndex((id) => String(id) === String(userId));
+		if (index === -1) {
+			event.likes.push(userId);
+		} else {
+			event.likes = event.likes.filter((id) => id !== userId);
+		}
 		await event.save();
-		res.status(200).json({ message: "user liked event" });
+
+		console.log(index);
+
+		res.status(200).json({
+			message: `user ${index === -1 ? "liked" : "unliked"} event`,
+		});
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
@@ -145,14 +157,30 @@ export const subscribeEvent = async (req, res, next) => {
 				.json({ message: "You are not allowed to do that" });
 
 		const event = await Event.findById(eventId);
-		event.subscribers.push(userId);
-		await event.save();
-
 		const user = await User.findById(userId);
-		user.subscripeAt.push(eventId);
+
+		const index = event.subscribers.findIndex((id) => id === userId);
+
+		if (index === -1) {
+			event.subscribers.push(userId);
+			user.subscripeAt.push(eventId);
+		} else {
+			event.subscribers = event.subscribers.filter(
+				(e) => String(e) !== String(userId)
+			);
+			user.subscripeAt = user.subscripeAt.filter(
+				(s) => String(s) !== String(eventId)
+			);
+		}
+
+		await event.save();
 		await user.save();
 
-		res.status(200).json({ message: "user subscribe to that event" });
+		res.status(200).json({
+			message: `user ${
+				index === -1 ? "subscribe" : "unsubscribed"
+			} to that event`,
+		});
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
@@ -176,30 +204,6 @@ export const getSubscribedEvents = async (req, res, next) => {
 			message: "here all subscribed events",
 			result: allSubscribedEvents,
 		});
-	} catch (error) {
-		res.status(500).json({ message: "somthing went wrong !!", error });
-	}
-};
-
-export const unSubscribeEvent = async (req, res, next) => {
-	const userId = req.userId;
-	const eventId = req.params.eventId;
-
-	try {
-		if (!userId)
-			return res
-				.status(400)
-				.json({ message: "You are not allowed to do thaar" });
-
-		const event = await Event.findById(eventId);
-		event.subscribers.pull(userId);
-		await event.save();
-
-		const user = await User.findById(userId);
-		user.subscripeAt.pull(eventId);
-		await user.save();
-
-		res.status(200).json({ message: "user unsubscribed to that event" });
 	} catch (error) {
 		res.status(500).json({ message: "somthing went wrong !!", error });
 	}
