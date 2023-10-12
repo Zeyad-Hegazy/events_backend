@@ -6,7 +6,7 @@ import cors from "cors";
 import orgaizerRoutes from "./routes/organizerRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
-import authRoutes from "./routes/common.js";
+import commonRoutes from "./routes/common.js";
 
 const connection_url = process.env.CONNENCTION_URL;
 const PORT = process.env.PORT || 8000;
@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use("/", authRoutes);
+app.use("/", commonRoutes);
 app.use("/organize", orgaizerRoutes);
 app.use("/user", userRoutes);
 app.use("/event", eventRoutes);
