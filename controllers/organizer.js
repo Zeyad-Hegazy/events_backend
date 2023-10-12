@@ -4,39 +4,6 @@ import Users from "../models/Users.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const signIn = async (req, res, next) => {
-	const { email, password } = req.body;
-
-	try {
-		const existingOrganizer = await Organizer.findOne({ email });
-
-		if (!existingOrganizer)
-			return res.status(404).json({ message: "Organizer not found!" });
-
-		const isPasswordCorrect = await bcrypt.compare(
-			password,
-			existingOrganizer.password
-		);
-
-		if (!isPasswordCorrect)
-			return res.status(400).json({ message: "Invalid Password" });
-
-		const token = jwt.sign(
-			{
-				email: existingOrganizer.email,
-				id: existingOrganizer._id,
-			},
-			"SECRET_TEXT"
-		);
-
-		res
-			.status(200)
-			.json({ result: existingOrganizer, type: "organizer", token });
-	} catch (error) {
-		res.status(500).json({ message: "somthing went wrong !!", error });
-	}
-};
-
 export const signUp = async (req, res, next) => {
 	const { name, business, email, password, confirmpassword } = req.body;
 
